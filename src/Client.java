@@ -1,14 +1,10 @@
-import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
 
 
@@ -16,10 +12,12 @@ public class Client {
 	
 	// Attributes
 	
-	String serverHost;
-	int serverPort;
-	int time;
-	static int data = 0;
+	private String serverHost;
+	private int serverPort;
+	private int time;
+	private final int DATA = 0;
+	
+	// Constructor
 	
 	public Client(String serverHost, int serverPort, int time) {
 		this.serverHost = serverHost;
@@ -29,22 +27,24 @@ public class Client {
 	}
 	
 	
-	public void sendData() throws IOException {
+	public void sendData() throws IOException, InterruptedException {
 		
 		Socket clientSocket = null;
 		clientSocket = new Socket();
 		int bytesSent = 0;
 		
-		// this is not right.. bind to localhost?
-		//clientSocket.bind(new InetSocketAddress(serverHost, serverPort));
-		
 		clientSocket.connect(new InetSocketAddress(serverHost, serverPort));
-		
 		
 		// Prepare data of pure 0's to be sent
 		
-		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-		byte[] dataBytes = ByteBuffer.allocate(1024).putInt(data).array();
+		byte[] dataBytes = ByteBuffer.allocate(1024).putInt(DATA).array();
+		
+		OutputStream out = clientSocket.getOutputStream(); 
+		DataOutputStream dos = new DataOutputStream(out);
+		
+		//PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+		
+		
 		
 		
 		// Calculate current running time for sent messages
@@ -54,22 +54,22 @@ public class Client {
 		
 		long startTime = System.currentTimeMillis();
 		long currentTime = System.currentTimeMillis();
-		long totalTime;
+		long totalTime = 1;
+			
 		
 		while ((totalTime = currentTime - startTime) < maxTime) {
 		
 			// Send data to server
+			dos.write(dataBytes);
+			dos.flush();
 			
-			//out.println(dataBytes);
-			
-			out.write(dataBytes);
-
 			currentTime = System.currentTimeMillis();
 			
-			System.out.println("");
-			
 			bytesSent += dataBytes.length;
+			TimeUnit.SECONDS.sleep(1);
 		}
+		
+		dos.close();
 
 		// Close socket at print summary information
 		
@@ -84,15 +84,13 @@ public class Client {
 	// for the client
 	
 	public void printSummary(int sent, double rate) {
-		System.out.println("sent= " + sent + " KB rate= " + rate + " Mbps");
+		System.out.println("sent=" + sent + " KB rate=" + rate + " Mbps");
 	}
 	
 	// This method calculates bandwidth for the client's connection
 	
-	public double calculateRate(int sent, double time) {
-		
-		double rate = (double) sent/ time;
-		
+	private float calculateRate(long bytesReceived, long totalTime) {
+		float rate = (float) bytesReceived/ totalTime;
 		return rate;
 	}
 	
