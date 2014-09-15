@@ -8,6 +8,7 @@ public class Iperfer {
 		
 		int argCount = args.length;
 		
+		// If there is no argument, it closes the program
 		if(argCount == 0){
 			System.out.println("Error: missing or additional arguments");
 			System.exit(-2);
