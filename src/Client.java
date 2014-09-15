@@ -36,7 +36,8 @@ public class Client {
 		int bytesSent = 0;
 		
 		// this is not right.. bind to localhost?
-		clientSocket.bind(new InetSocketAddress(serverHost, serverPort));
+		//clientSocket.bind(new InetSocketAddress(serverHost, serverPort));
+		
 		clientSocket.connect(new InetSocketAddress(serverHost, serverPort));
 		
 		
@@ -59,12 +60,17 @@ public class Client {
 		
 			// Send data to server
 			
-			out.println(dataBytes);
+			//out.println(dataBytes);
+			
+			out.write(dataBytes);
+
 			currentTime = System.currentTimeMillis();
+			
+			System.out.println("");
+			
 			bytesSent += dataBytes.length;
 		}
-		
-		
+
 		// Close socket at print summary information
 		
 		clientSocket.close();

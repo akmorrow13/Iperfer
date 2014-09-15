@@ -8,6 +8,11 @@ public class Iperfer {
 		
 		int argCount = args.length;
 		
+		if(argCount == 0){
+			System.out.println("Error: missing or additional arguments");
+			System.exit(-2);
+		}
+		
 		String mode = args[0];
 		
 		String serverHost = "";
@@ -38,15 +43,20 @@ public class Iperfer {
 			}
 		}
 		
+		
+
+		
 		// Server mode
 		
 		if (argCount == 3 && mode.equals("-s")) { 
 			Server server = new Server(port);
+			server.listenClients();
 		
 		// Client mode
 		} else if (argCount == 7 && mode.equals("-c")) { 
 			Client client = new Client(serverHost, port, time);
-		
+			client.sendData();
+			
 		// Invalid parameters
 		} else {
 			
