@@ -10,7 +10,7 @@ public class Server {
 
 	private ServerSocket serverSocket;
 	private long bytesReceived = 0;
-	private String rateString = null;
+	private float rate;
 	
 	// Constructor
 
@@ -55,7 +55,7 @@ public class Server {
 		long lastMoment = System.currentTimeMillis();
 		long totalTime = lastMoment - firstMoment;
 
-		rateString = calculateRate(bytesReceived, totalTime);
+		rate = calculateRate(bytesReceived, totalTime);
 
 		printSummary();
 
@@ -65,28 +65,18 @@ public class Server {
 	// This method prints out the summary data of bytes sent and rate for the client
 
 	private void printSummary() {
-		System.out.println("received=" + bytesReceived/1000.0 + " KB rate=" + rateString);
+		System.out.println("received=" + bytesReceived/1000.0 + " KB rate=" + (8*rate)/1000.0 + " Mbps");
 	}
 
 	// This method calculates bandwidth for the client's connection
 	
-		private String calculateRate(long bytesReceived, long totalTime) {
-			String rateString = null;
-			float rate = (float) bytesReceived/ totalTime;
-			
-			
-			if(rate < 1024*10e0){
-				rateString = rate + " KBps";
-			}else if(rate > 1024*10e0 && rate < 1024*10e3){
-				rateString = rate/10e3 + " MBps";
-			}else if(rate > 1024*10e3 && rate < 1024*10e6){
-				rateString = rate/10e6 + " GBps";
-			}else if(rate > 1024*10e6 && rate < 1024*10e9){
-				rateString = rate/10e9 + " TBps";
-			}
-			
-			return rateString;
-		}
+	private float calculateRate(long bytesReceived, long totalTime) {
+
+		float rate = (float) (bytesReceived/ totalTime);
+		
+		// This rate is in KBs
+		return rate;
+	}
 		
 	
 
